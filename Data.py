@@ -33,6 +33,8 @@ class data:
     def loadTrainDataFrame(self):
         self._train_df = pd.read_csv(self.path + "/train.csv")
         self.fillMissingValues()
+        self.discretization(self._train_df)
+        self._train_df.to_csv("trainresults1.csv")
 
     def fillMissingValues(self):
         print("The null valus:")
@@ -46,25 +48,24 @@ class data:
                 self._train_df[columnName].fillna(self._train_df[columnName].mode()[0], inplace=True)
         print("The null valus:")
         print(self._train_df.apply(lambda x: sum(x.isnull()), axis=0))
-        self._train_df.to_csv("trainresults.csv")
+
 
     def discretization(self, df):
         for column in df.columns:
             if self._structureDict[column] == "NUMERIC":
                 minval = df[column].min()
                 maxval = df[column].max()
-                weight = (maxval - minval) / int(self.bins)
+                weight = float(maxval - minval) / float(self.bins)
                 cutpoints = []
                 labels = []
                 cutpoints.append(float("-inf"))
                 for i in range(self.bins):
                     cutpoints.append(minval + i * weight)
                 cutpoints.append(float("inf"))
-                for j in range(self.bins):
+                for j in range(self.bins+1):
                     labels.append(j + 1)
-                df[column] = pd.cut(column, bins=cutpoints, labels=labels, include_lowest=True)
-
-
+                df[column] = pd.cut(df[column], bins=cutpoints, labels=labels, include_lowest=True)
 ####main####
-Data = data(os.path.dirname(os.path.realpath(__file__)), 3)
+Data = data(os.path.dirname(os.path.realpath(__file__)),3)
 Data.loadTrainDataFrame()
+
