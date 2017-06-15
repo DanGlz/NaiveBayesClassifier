@@ -5,7 +5,8 @@ import re
 class data:
     _structureDict={};
 
-    def __init__(self, path):
+    def __init__(self, path,bins):
+        self.bins=bins
         self.path = path
         self.getStructure()
         self.printDict();
@@ -28,6 +29,20 @@ class data:
 
     def loadTrainDataFrame(self):
         df= pd.read_csv(self.path+"/train.csv")
+
+
+    def  discretion(self,df):
+        for column in df.columns:
+            if self._structureDict[column] == "NUMERIC":
+                minval=column.min()
+                maxval=column.max()
+                weight= (minval+maxval)/self.bins
+                cutpoints= []
+                for i in range(1,self.bins):
+                    cutpoints.append(minval+i*weight)
+                labels=range(1,self.bins+1)
+                df[column]=pd.cut(column, bins=cutpoints, labels=labels, include_lowest=True)
+
 
 
 
