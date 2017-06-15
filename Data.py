@@ -1,9 +1,11 @@
 import pandas as pd
 import os
 import re
+from scipy.stats import mode
 
 class data:
-    _structureDict={};
+    _structureDict = {}
+    _train_df = None
 
     def __init__(self, path):
         self.path = path
@@ -27,19 +29,25 @@ class data:
             print(values)
             print(" ")
 
-    def loadTrainDataFrame(self, filename):
-        df= pd.read_csv(self.path+"/"+filename+".csv")
-        self.fillMissingValues(df)
+    def loadTrainDataFrame(self):
+        self._train_df = pd.read_csv(self.path+"/train.csv")
+        self.fillMissingValues()
 
-    def fillMissingValues (self, df):
-        df =pd.read_csv(self.path+"/train.csv")  #delete before test!
-        for columnName in df.columns:
+    def fillMissingValues (self):
+        print("The null valus:")
+        print(self._train_df.apply(lambda x: sum(x.isnull()), axis=0))
+        for columnName in self._train_df.columns:
+            if columnName == "class":
+                continue
             if self._structureDict[columnName] == "NUMERIC":
-             df[columnName].fillna()
-
+                self._train_df[columnName].fillna(self._train_df[columnName].mean(), inplace=True)
+            else:
+                self._train_df[columnName].fillna(self._train_df[columnName].mode()[0], inplace=True)
+        print("The null valus:")
+        print(self._train_df.apply(lambda x: sum(x.isnull()), axis=0))
+        self._train_df.to_csv("trainresults.csv")
 
 ####main####
-
 Data = data(os.path.dirname(os.path.realpath(__file__)))
-Data.loadTrainDataFrame("train");
+Data.loadTrainDataFrame("train")
 
