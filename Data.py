@@ -8,7 +8,8 @@ class data:
     def __init__(self, path):
         self.path = path
         self.getStructure()
-        self.printDict();
+      # self.printDict();
+
 # Add Structure to dictionary
     def getStructure(self):
         lines = tuple(open(self.path+"/Structure.txt", 'r'))
@@ -26,13 +27,19 @@ class data:
             print(values)
             print(" ")
 
-    def loadTrainDataFrame(self):
-        df= pd.read_csv(self.path+"/train.csv")
+    def loadTrainDataFrame(self, filename):
+        df= pd.read_csv(self.path+"/"+filename+".csv")
+        self.fillMissingValues(df)
+
+    def fillMissingValues (self, df):
+        df =pd.read_csv(self.path+"/train.csv")  #delete before test!
+        for columnName in df.columns:
+            if self._structureDict[columnName] == "NUMERIC":
+             df[columnName].fillna()
 
 
-
-
+####main####
 
 Data = data(os.path.dirname(os.path.realpath(__file__)))
-
+Data.loadTrainDataFrame("train");
 
