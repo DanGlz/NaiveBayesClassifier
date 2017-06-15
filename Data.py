@@ -18,13 +18,19 @@ class data:
                 self._structureDict[splitedLine[1]] = "NUMERIC"  # add to dictionary
             else:
                 splitedLine[2] = splitedLine[2].replace('{', '').replace('}', '')  # add to dictionary
-                self._structureDict[splitedLine[1]] = re.split('{|}|,| ', splitedLine[2])
+                self._structureDict[splitedLine[1]] = re.split(',', splitedLine[2])
 
     def printDict(self):
         for keys, values in self._structureDict.items():
             print(keys)
             print(values)
             print(" ")
+
+    def loadTrainDataFrame(self):
+        df= pd.read_csv(self.path+"/train.csv")
+
+
+
 
 
 Data = data(os.path.dirname(os.path.realpath(__file__)))
