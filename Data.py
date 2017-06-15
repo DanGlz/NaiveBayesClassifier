@@ -7,7 +7,8 @@ class data:
     _structureDict = {}
     _train_df = None
 
-    def __init__(self, path):
+    def __init__(self, path,bins):
+        self.bins=bins
         self.path = path
         self.getStructure()
       # self.printDict();
@@ -47,7 +48,22 @@ class data:
         print(self._train_df.apply(lambda x: sum(x.isnull()), axis=0))
         self._train_df.to_csv("trainresults.csv")
 
+    def discretization(self, df):
+        for column in df.columns:
+            if self._structureDict[column] == "NUMERIC":
+                minval = df[column].min()
+                maxval = df[column].max()
+                weight = (maxval - minval) / int(self.bins)
+                cutpoints = []
+                labels = []
+                cutpoints.append(float("-inf"))
+                for i in range(self.bins):
+                    cutpoints.append(minval + i * weight)
+                cutpoints.append(float("inf"))
+                for j in range(self.bins):
+                    labels.append(j + 1)
+                df[column] = pd.cut(column, bins=cutpoints, labels=labels, include_lowest=True)
 ####main####
-Data = data(os.path.dirname(os.path.realpath(__file__)))
+Data = data(os.path.dirname(os.path.realpath(__file__)),3)
 Data.loadTrainDataFrame("train")
 
