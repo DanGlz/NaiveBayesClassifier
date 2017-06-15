@@ -30,7 +30,8 @@ class data:
 
     def loadTrainDataFrame(self, filename):
         df= pd.read_csv(self.path+"/"+filename+".csv")
-        self.fillMissingValues(df)
+        self.discretization(df)
+        #self.fillMissingValues(df)
 
     def fillMissingValues (self, df):
         df =pd.read_csv(self.path+"/train.csv")  #delete before test!
@@ -38,16 +39,20 @@ class data:
             if self._structureDict[columnName] == "NUMERIC":
              df[columnName].fillna()
 
-    def  discretion(self,df):
+    def discretization(self,df):
         for column in df.columns:
             if self._structureDict[column] == "NUMERIC":
-                minval=column.min()
-                maxval=column.max()
-                weight= (minval+maxval)/self.bins
+                minval=df[column].min()
+                maxval=df[column].max()
+                weight= (maxval-minval)/int(self.bins)
                 cutpoints= []
-                for i in range(1,self.bins):
+                labels=[]
+                cutpoints.append(float("-inf"))
+                for i in range(self.bins):
                     cutpoints.append(minval+i*weight)
-                labels=range(1,self.bins+1)
+                cutpoints.append(float("inf"))
+                for j in range(self.bins):
+                    labels.append(j+1)
                 df[column]=pd.cut(column, bins=cutpoints, labels=labels, include_lowest=True)
 
 
@@ -55,6 +60,6 @@ class data:
 
 ####main####
 
-Data = data(os.path.dirname(os.path.realpath(__file__)))
+Data = data(os.path.dirname(os.path.realpath(__file__)),3)
 Data.loadTrainDataFrame("train");
 
