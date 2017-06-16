@@ -36,6 +36,9 @@ class data:
         self.discretization(self._train_df)
         cs=classifier(self._train_df,self._structureDict,self.bins)
         cs.preparedata()
+        dftest=pd.read_csv(self.path + "/test.csv")
+        self.discretization(dftest)
+        cs.classify(dftest)
         self._train_df.to_csv("trainresults1.csv")
 
     def fillMissingValues(self):
@@ -70,6 +73,7 @@ class data:
 class classifier:
     attributecountdict={}
     classcountdict={}
+
     def __init__(self,df,struct,bins):
         self.df=df
         self.struct=struct
@@ -82,8 +86,34 @@ class classifier:
                 count=len(self.struct[key])
                 self.attributecountdict[key] = count
         self.classcountdict=self.df["class"].value_counts()
+
     def classify(self,testset):
         m=2
+        count_no=0
+        count_yes=0
+        for index, row in testset.iterrows():
+            mestimate={}
+            for cls in self.struct["class"]:
+                mestimate[cls] = 1
+            for colname in self.df.columns:
+                for cls in self.struct["class"]:
+                    samples_with_both_values = len(self.df.loc[(self.df[colname] == row[colname]) & (self.df["class"] == row["class"])])
+                    num_of_diff_values_attr = self.attributecountdict[colname]
+                    num_of_vals_class=self.classcountdict[cls]
+                    mestimate[cls] = mestimate[cls]*(samples_with_both_values+(m/num_of_diff_values_attr))/( num_of_vals_class+m)
+            for cls in self.struct["class"]:
+                mestimate[cls]=mestimate[cls]*(self.classcountdict[cls]/self.df.shape[0])
+            classification = max(mestimate.iterkeys(), key=(lambda key: mestimate[key]))
+            if classification=="yes":
+                count_yes=count_yes+1
+            else:
+                count_no=count_no+1;
+
+        print("yes")
+        print(count_yes)
+        print("no")
+        print(count_no)
+
 
 
 
