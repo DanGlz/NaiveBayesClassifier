@@ -1,21 +1,21 @@
 import pandas as pd
 import os
 import re
-from scipy.stats import mode
+
 
 class data:
     _structureDict = {}
     _train_df = None
 
-    def __init__(self, path,bins):
-        self.bins=bins
+    def __init__(self, path, bins):
+        self.bins = bins
         self.path = path
         self.getStructure()
-      # self.printDict();
+        # self.printDict();
 
-# Add Structure to dictionary
+    # Add Structure to dictionary
     def getStructure(self):
-        lines = tuple(open(self.path+"/Structure.txt", 'r'))
+        lines = tuple(open(self.path + "/Structure.txt", 'r'))
         for line in lines:  # get line by line
             splitedLine = line.split()
             if splitedLine[2] == "NUMERIC":
@@ -31,14 +31,14 @@ class data:
             print(" ")
 
     def loadTrainDataFrame(self):
-        self._train_df = pd.read_csv(self.path+"/train.csv")
+        self._train_df = pd.read_csv(self.path + "/train.csv")
         self.fillMissingValues()
         self.discretization(self._train_df)
         cs=classifier(self._train_df,self._structureDict,self.bins)
         cs.preparedata()
         self._train_df.to_csv("trainresults1.csv")
 
-    def fillMissingValues (self):
+    def fillMissingValues(self):
         print("The null valus:")
         print(self._train_df.apply(lambda x: sum(x.isnull()), axis=0))
         for columnName in self._train_df.columns:
