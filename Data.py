@@ -34,6 +34,8 @@ class data:
         self._train_df = pd.read_csv(self.path+"/train.csv")
         self.fillMissingValues()
         self.discretization(self._train_df)
+        cs=classifier(self._train_df,self._structureDict,self.bins)
+        cs.preparedata()
         self._train_df.to_csv("trainresults1.csv")
 
     def fillMissingValues (self):
@@ -65,6 +67,29 @@ class data:
                 for j in range(self.bins+1):
                     labels.append(j + 1)
                 df[column] = pd.cut(df[column], bins=cutpoints, labels=labels, include_lowest=True)
+class classifier:
+    attributecountdict={}
+    classcountdict={}
+    def __init__(self,df,struct,bins):
+        self.df=df
+        self.struct=struct
+        self.bins=bins
+    def preparedata(self):
+        for key in self.struct:
+            if self.struct[key]=="NUMERIC":
+                self.attributecountdict[key] =self.bins
+            else:
+                count=len(self.struct[key])
+                self.attributecountdict[key] = count
+        self.classcountdict=self.df["class"].value_counts()
+    def classify(self,testset):
+        m=2
+
+
+
+
+
+
 ####main####
 Data = data(os.path.dirname(os.path.realpath(__file__)),3)
 Data.loadTrainDataFrame()
