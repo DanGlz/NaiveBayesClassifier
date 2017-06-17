@@ -89,21 +89,27 @@ class classifier:
         count_no=0
         count_yes=0
         count_correct=0
+        num_of_row_in_train = self.df.shape[0]
+        matching_class_atribute_dict ={}
         for index, row in testset.iterrows():
             mestimate={}
             for cls in self.struct["class"]:
                 mestimate[cls] = 1
             for colname in self.df.columns:
                 if colname =="class":
-                      continue;
+                    continue
                 for cls in self.struct["class"]:
-                    samples_with_both_values = len(self.df.loc[(self.df[colname] == row[colname]) & (self.df["class"] == cls)])
+                    dictKey =colname+"_"+str(row[colname])+"_"+cls
+                    if dictKey in matching_class_atribute_dict:
+                        samples_with_both_values = matching_class_atribute_dict[dictKey]
+                    else:
+                        samples_with_both_values = len(self.df.loc[(self.df[colname] == row[colname]) & (self.df["class"] == cls)])
+                        matching_class_atribute_dict[dictKey]=samples_with_both_values
                     num_of_diff_values_attr = self.attributecountdict[colname]
                     num_of_vals_class=self.classcountdict[cls]
-                  #  print(float(mestimate[cls])*(samples_with_both_values+(m/num_of_diff_values_attr))/( num_of_vals_class+m))
                     mestimate[cls] = float(mestimate[cls])*(samples_with_both_values+(m/num_of_diff_values_attr))/( num_of_vals_class+m)
             for cls in self.struct["class"]:
-                mestimate[cls]=float(mestimate[cls])*(float(self.classcountdict[cls])/self.df.shape[0])
+                mestimate[cls]=float(mestimate[cls])*(float(self.classcountdict[cls])/num_of_row_in_train)
             classification = max(mestimate.iterkeys(), key=(lambda key: mestimate[key]))
             if(classification == row["class"]):
                 count_correct=count_correct+1
