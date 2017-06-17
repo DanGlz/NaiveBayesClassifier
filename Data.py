@@ -84,22 +84,25 @@ class classifier:
         self.classcountdict=self.df["class"].value_counts()
 
     def classify(self,testset):
-        print("classify started")
+        #initialization of variables
         m=2
         count_no=0
         count_yes=0
         count_correct=0
         num_of_row_in_train = self.df.shape[0]
         matching_class_atribute_dict ={}
+        #go over each row and classify using naive bayes
         for index, row in testset.iterrows():
             mestimate={}
+            #initialize mestiamte for each class value
             for cls in self.struct["class"]:
                 mestimate[cls] = 1
             for colname in self.df.columns:
                 if colname =="class":
                     continue
                 for cls in self.struct["class"]:
-                    dictKey =colname+"_"+str(row[colname])+"_"+cls
+                    # memoization of all attribute value and class value that match
+                    dictKey =colname+"_"+str(row[colname])+"_"+str(cls)
                     if dictKey in matching_class_atribute_dict:
                         samples_with_both_values = matching_class_atribute_dict[dictKey]
                     else:
@@ -111,6 +114,8 @@ class classifier:
             for cls in self.struct["class"]:
                 mestimate[cls]=float(mestimate[cls])*(float(self.classcountdict[cls])/num_of_row_in_train)
             classification = max(mestimate.iterkeys(), key=(lambda key: mestimate[key]))
+
+            #delete all from here
             if(classification == row["class"]):
                 count_correct=count_correct+1
             if classification=="yes":
