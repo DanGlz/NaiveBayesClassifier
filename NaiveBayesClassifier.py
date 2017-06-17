@@ -6,6 +6,7 @@ import re
 class data:
     _structureDict = {}
     _train_df = None
+    _classifier=None
 
     def __init__(self, path, bins):
         self.bins = bins
@@ -34,12 +35,16 @@ class data:
         self._train_df = pd.read_csv(self.path + "/train.csv")
         self.fillMissingValues()
         self.discretization(self._train_df)
-        cs=classifier(self._train_df,self._structureDict,self.bins)
-        cs.preparedata()
+        self._classifier=classifier(self._train_df,self._structureDict,self.bins)
+        self._classifier.preparedata()
+    def loadTestSet(self):
+
         dftest=pd.read_csv(self.path + "/test.csv")
         self.discretization(dftest)
-        cs.classify(dftest)
-        self._train_df.to_csv("trainresults1.csv")
+        test_result=self._classifier.classify(dftest)
+        text_file = open(self.path+"/output.txt", "w")
+        text_file.write(test_result)
+        text_file.close()
 
     def fillMissingValues(self):
         for columnName in self._train_df.columns:
@@ -65,6 +70,14 @@ class data:
                 for j in range(self.bins+1):
                     labels.append(j + 1)
                 df[column] = pd.cut(df[column], bins=cutpoints, labels=labels, include_lowest=True)
+            else:
+                check = "true"
+                for val in self._structureDict[column]:
+                    if val.isdigit():
+                        check="false"
+                        break
+                if check == "true":
+                    df[column]=df[column].str.lower()
 class classifier:
     attributecountdict={}
     classcountdict={}
@@ -81,10 +94,14 @@ class classifier:
             else:
                 count=len(self.struct[key])
                 self.attributecountdict[key] = count
-        self.classcountdict=self.df["class"].value_counts()
+        countclass=self.df["class"].value_counts().to_dict()
+        for key in countclass:
+            self.classcountdict[str(key)]=countclass[key]
+
 
     def classify(self,testset):
         #initialization of variables
+        classification_testfile=""
         m=2
         count_no=0
         count_yes=0
@@ -96,26 +113,34 @@ class classifier:
             mestimate={}
             #initialize mestiamte for each class value
             for cls in self.struct["class"]:
-                mestimate[cls] = 1
+                mestimate[str(cls)] = 1
             for colname in self.df.columns:
                 if colname =="class":
                     continue
                 for cls in self.struct["class"]:
+                    cls=str(cls)
                     # memoization of all attribute value and class value that match
                     dictKey =colname+"_"+str(row[colname])+"_"+str(cls)
                     if dictKey in matching_class_atribute_dict:
                         samples_with_both_values = matching_class_atribute_dict[dictKey]
                     else:
-                        samples_with_both_values = len(self.df.loc[(self.df[colname] == row[colname]) & (self.df["class"] == cls)])
-                        matching_class_atribute_dict[dictKey]=samples_with_both_values
+                        real_cls=cls
+                        if cls.isdigit():
+                            real_cls=int(real_cls)
+                        samples_with_both_values = len(self.df.loc[(self.df[colname] == row[colname]) & (self.df["class"] == real_cls)])
+                        matching_class_atribute_dict[dictKey] = samples_with_both_values
                     num_of_diff_values_attr = self.attributecountdict[colname]
                     num_of_vals_class=self.classcountdict[cls]
                     mestimate[cls] = float(mestimate[cls])*(samples_with_both_values+(m/num_of_diff_values_attr))/( num_of_vals_class+m)
             for cls in self.struct["class"]:
-                mestimate[cls]=float(mestimate[cls])*(float(self.classcountdict[cls])/num_of_row_in_train)
+                cls=str(cls)
+                mestimate[str(cls)]=float(mestimate[cls])*(float(self.classcountdict[cls])/num_of_row_in_train)
+            #choose best matching class by mestimate
             classification = max(mestimate.iterkeys(), key=(lambda key: mestimate[key]))
-
-            #delete all from here
+            classification_testfile= classification_testfile+str(index+1)+" "+str(classification)+"\n"
+        return classification_testfile
+        '''
+                    ##delete all from here
             if(classification == row["class"]):
                 count_correct=count_correct+1
             if classification=="yes":
@@ -129,6 +154,10 @@ class classifier:
         print(count_no)
         print ("correct percentage:")
         print (count_correct)
+        
+        '''
+
+    ##
 
 
 
@@ -139,4 +168,5 @@ class classifier:
 ####main####
 Data = data(os.path.dirname(os.path.realpath(__file__)),3)
 Data.loadTrainDataFrame()
+Data.loadTestSet()
 
