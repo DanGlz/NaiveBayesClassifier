@@ -1,5 +1,4 @@
 import pandas as pd
-import os
 import re
 
 
@@ -63,12 +62,13 @@ class data:
                 cutpoints = []
                 labels = []
                 cutpoints.append(float("-inf"))
-                for i in range(self.bins):
+                for i in range(self.bins-1):
                     cutpoints.append(minval + i * weight)
                 cutpoints.append(float("inf"))
-                for j in range(self.bins+1):
+                for j in range(self.bins):
                     labels.append(j + 1)
                 df[column] = pd.cut(df[column], bins=cutpoints, labels=labels, include_lowest=True)
+                print (df[column].value_counts())
             else:
                 check = "true"
                 for val in self._structureDict[column]:
@@ -77,6 +77,7 @@ class data:
                         break
                 if check == "true":
                     df[column]=df[column].str.lower()
+
 class classifier:
     attributecountdict={}
     classcountdict={}
@@ -137,13 +138,12 @@ class classifier:
             #choose best matching class by mestimate
             classification = max(mestimate.iterkeys(), key=(lambda key: mestimate[key]))
             classification_testfile= classification_testfile+str(index+1)+" "+str(classification)+"\n"
-        return classification_testfile
-        '''
-                    ##delete all from here
+
+            ##delete all from here
             if(classification == row["class"]):
-                count_correct=count_correct+1
+             count_correct=count_correct+1
             if classification=="yes":
-                count_yes=count_yes+1
+             count_yes=count_yes+1
             else:
                 count_no=count_no+1;
 
@@ -153,19 +153,6 @@ class classifier:
         print(count_no)
         print ("correct percentage:")
         print (count_correct)
-        
-        '''
 
-    ##
-
-
-
-
-
-
-
-####main####
-Data = data(os.path.dirname(os.path.realpath(__file__)),3)
-Data.loadTrainDataFrame()
-Data.loadTestSet()
+        return classification_testfile
 

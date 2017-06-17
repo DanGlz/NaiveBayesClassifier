@@ -39,12 +39,13 @@ class GUI:
 
     #  handles the browse button
     def browseClick(self):
+        self.train_df = None
         path = fd.askdirectory(parent=root, title='Choose the directory path')
         self.Path_Entry.delete(0, END)
         self.Path_Entry.insert(0, path)
         if self.checkValidPath():
             self.Bins_Entry.configure(state='normal')
-            self.train_df = pd.read_csv(str(self.Path_Entry) + "/train.csv")
+            self.train_df = pd.read_csv(str(self.Path_Entry.get()) + "/train.csv")
         else:
             self.train_df = None
             self.Bins_Entry.configure(state='disabled')
@@ -52,7 +53,8 @@ class GUI:
     # handled the Build button
     def buildClick(self):
         if self.checkValidPath() and self.checkValidBins():
-            self._nbc = NaiveBayesClassifier.data(str(self.Path_Entry), self.bins)
+            self._nbc = NaiveBayesClassifier.data(str(self.Path_Entry.get()), self.bins)
+            self._nbc.loadTrainDataFrame()
             self.BuildPassed = True
             tkinter.messagebox.showinfo("Message", "Building classifier using train-set is done!")
         else:
@@ -62,7 +64,8 @@ class GUI:
         if not self.BuildPassed:
             tkinter.messagebox.showinfo("Error", "You need to build the model first!")
         else:
-            self._nbc
+            self._nbc.loadTestSet()
+            tkinter.messagebox.showinfo("Message", "The Classify is done!")
 
   # Checks if all the files are exists in the given directory path
     def checkValidPath(self):
@@ -85,9 +88,9 @@ class GUI:
     # Checks if bins value is valid
     def checkValidBins(self):
         self.bins = self.Bins_Entry.get()
-        num_of_records= self.train_df[0]
+        num_of_records= self.train_df.shape[0]
         # check if the bins value is digit AND bigger then 1
-        if not self.bins.isdigit() or not int(self.bins) > 1:
+        if not self.bins.isdigit():
             tkinter.messagebox.showinfo("Error", "The bins value is not valid. Bins value must be digit!")
             return False
         if int(self.bins) < 2 or int(self.bins) > num_of_records:
