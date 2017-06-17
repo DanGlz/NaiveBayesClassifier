@@ -88,6 +88,7 @@ class classifier:
         m=2
         count_no=0
         count_yes=0
+        count_correct=0
         for index, row in testset.iterrows():
             mestimate={}
             for cls in self.struct["class"]:
@@ -104,17 +105,19 @@ class classifier:
             for cls in self.struct["class"]:
                 mestimate[cls]=float(mestimate[cls])*(float(self.classcountdict[cls])/self.df.shape[0])
             classification = max(mestimate.iterkeys(), key=(lambda key: mestimate[key]))
+            if(classification == row["class"]):
+                count_correct=count_correct+1
             if classification=="yes":
-                print("yes")
                 count_yes=count_yes+1
             else:
-                print("no")
                 count_no=count_no+1;
 
         print("yes")
         print(count_yes)
         print("no")
         print(count_no)
+        print ("correct percentage:")
+        print (count_correct)
 
 
 
