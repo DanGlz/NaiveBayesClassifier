@@ -11,7 +11,6 @@ class data:
         self.bins = bins
         self.path = path
         self.getStructure()
-        # self.printDict();
 
     # Add Structure to dictionary
     def getStructure(self):
