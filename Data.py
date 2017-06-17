@@ -42,8 +42,6 @@ class data:
         self._train_df.to_csv("trainresults1.csv")
 
     def fillMissingValues(self):
-        print("The null valus:")
-        print(self._train_df.apply(lambda x: sum(x.isnull()), axis=0))
         for columnName in self._train_df.columns:
             if columnName == "class":
                 continue
@@ -51,9 +49,6 @@ class data:
                 self._train_df[columnName].fillna(self._train_df[columnName].mean(), inplace=True)
             else:
                 self._train_df[columnName].fillna(self._train_df[columnName].mode()[0], inplace=True)
-        print("The null valus:")
-        print(self._train_df.apply(lambda x: sum(x.isnull()), axis=0))
-
 
     def discretization(self, df):
         for column in df.columns:
@@ -78,16 +73,18 @@ class classifier:
         self.df=df
         self.struct=struct
         self.bins=bins
+
     def preparedata(self):
         for key in self.struct:
             if self.struct[key]=="NUMERIC":
-                self.attributecountdict[key] =self.bins
+                self.attributecountdict[key] = self.bins
             else:
                 count=len(self.struct[key])
                 self.attributecountdict[key] = count
         self.classcountdict=self.df["class"].value_counts()
 
     def classify(self,testset):
+        print("classify started")
         m=2
         count_no=0
         count_yes=0
@@ -96,17 +93,22 @@ class classifier:
             for cls in self.struct["class"]:
                 mestimate[cls] = 1
             for colname in self.df.columns:
+                if colname =="class":
+                      continue;
                 for cls in self.struct["class"]:
-                    samples_with_both_values = len(self.df.loc[(self.df[colname] == row[colname]) & (self.df["class"] == row["class"])])
+                    samples_with_both_values = len(self.df.loc[(self.df[colname] == row[colname]) & (self.df["class"] == cls)])
                     num_of_diff_values_attr = self.attributecountdict[colname]
                     num_of_vals_class=self.classcountdict[cls]
-                    mestimate[cls] = mestimate[cls]*(samples_with_both_values+(m/num_of_diff_values_attr))/( num_of_vals_class+m)
+                  #  print(float(mestimate[cls])*(samples_with_both_values+(m/num_of_diff_values_attr))/( num_of_vals_class+m))
+                    mestimate[cls] = float(mestimate[cls])*(samples_with_both_values+(m/num_of_diff_values_attr))/( num_of_vals_class+m)
             for cls in self.struct["class"]:
-                mestimate[cls]=mestimate[cls]*(self.classcountdict[cls]/self.df.shape[0])
+                mestimate[cls]=float(mestimate[cls])*(float(self.classcountdict[cls])/self.df.shape[0])
             classification = max(mestimate.iterkeys(), key=(lambda key: mestimate[key]))
             if classification=="yes":
+                print("yes")
                 count_yes=count_yes+1
             else:
+                print("no")
                 count_no=count_no+1;
 
         print("yes")
