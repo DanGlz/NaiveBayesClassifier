@@ -13,4 +13,4 @@
 @ATTRIBUTE campaign NUMERIC
 @ATTRIBUTE previous NUMERIC
 @ATTRIBUTE poutcome {unknown,other,failure,success}
-@ATTRIBUTE class {yes,no}
+@ATTRIBUTE class {0,1}
