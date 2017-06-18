@@ -53,8 +53,8 @@ class GUI:
 
     # handled the Build button
     def buildClick(self):
-        if self.checkValidPath() and self.checkValidBins():
-            self._nbc = NaiveBayesClassifier.data(str(self.Path_Entry.get()), self.bins)
+        if self.checkValidPath()and self.check_not_empty_files() and self.checkValidBins():
+            self._nbc = NaiveBayesClassifier.NaiveBayesClassifier(str(self.Path_Entry.get()), self.bins)
             self._nbc.load_train_data_frame()
             self.BuildPassed = True
             tkMessageBox.showinfo("Message", "Building classifier using train-set is done!")

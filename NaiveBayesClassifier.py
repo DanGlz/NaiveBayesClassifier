@@ -2,10 +2,10 @@ import pandas as pd
 import re
 
 # a class that manages all the dta and classification of the test and train set
-class data:
+class NaiveBayesClassifier:
     _structureDict = {}
     _train_df = None
-    _classifier=None
+    _classifier = None
     # constructor
     def __init__(self, path, bins):
         self.bins = bins
@@ -128,7 +128,7 @@ class classifier:
                 if colname == "class":
                     continue
                 for cls in self.struct["class"]:
-                    cls=str(cls)
+                    cls = str(cls)
                     # memoization of all attribute value and class value that match
                     dictKey = colname + "_" + str(row[colname]) + "_" + str(cls)
                     if dictKey in matching_class_atribute_dict:
