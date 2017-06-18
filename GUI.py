@@ -100,10 +100,10 @@ class GUI:
         if self.check_is_csv_empty("test.csv"):
             error = True
             empty_files += "<test.csv> "
-            if error:
-                tkMessageBox.showinfo("Error", "The following files are empty: \n" + empty_files)
-                return False
-            return True
+        if error:
+            tkMessageBox.showinfo("Error", "The following files are empty: \n" + empty_files)
+            return False
+        return True
 
     # check is the csv file empty
     def check_is_csv_empty(self, file_name):
