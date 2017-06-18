@@ -149,20 +149,3 @@ class classifier:
             classification = max(mestimate.iterkeys(), key=(lambda key: mestimate[key]))
             classification_testfile = classification_testfile+str(index+1)+" "+str(classification)+"\n"
 
-            # delete all from here
-            if(classification == row["class"]):
-             count_correct=count_correct+1
-            if classification=="yes":
-             count_yes=count_yes+1
-            else:
-                count_no=count_no+1;
-
-        print("yes")
-        print(count_yes)
-        print("no")
-        print(count_no)
-        print ("correct percentage:")
-        print (count_correct)
-
-        return classification_testfile
-

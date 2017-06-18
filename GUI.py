@@ -53,7 +53,7 @@ class GUI:
 
     # handled the Build button
     def buildClick(self):
-        if self.checkValidPath()and self.check_not_empty_files() and self.checkValidBins():
+        if self.checkValidPath() and self.checkValidBins() and self.check_not_empty_files():
             self._nbc = NaiveBayesClassifier.NaiveBayesClassifier(str(self.Path_Entry.get()), self.bins)
             self._nbc.load_train_data_frame()
             self.BuildPassed = True
@@ -103,7 +103,7 @@ class GUI:
             if error:
                 tkMessageBox.showinfo("Error", "The following files are empty: \n" + empty_files)
                 return False
-            return True
+        return True
 
     # check is the csv file empty
     def check_is_csv_empty(self, file_name):
@@ -125,10 +125,10 @@ class GUI:
         num_of_records = self.train_df.shape[0]
         # check if the bins value is digit AND bigger then 1
         if not self.bins.isdigit():
-            tkinter.messagebox.showinfo("Error", "The bins value is not valid. Bins value must be digit!")
+            tkMessageBox.showinfo("Error", "The bins value is not valid. Bins value must be digit!")
             return False
         if int(self.bins) < 2 or int(self.bins) > num_of_records:
-            tkinter.messagebox.showinfo("Error", "The bins value is out of range!")
+            tkMessageBox.showinfo("Error", "The bins value is out of range!")
             return False
         self.bins = int(self.bins)
         return True;
