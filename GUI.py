@@ -1,9 +1,10 @@
-from tkinter import *
-from tkinter import filedialog as fd
+import os.path
+from Tkinter import *
+import tkFileDialog
+import tkMessageBox
 import pandas as pd
 import NaiveBayesClassifier
-import tkinter.messagebox
-import os.path
+
 
 class GUI:
 
@@ -40,10 +41,10 @@ class GUI:
     #  handles the browse button
     def browseClick(self):
         self.train_df = None
-        path = fd.askdirectory(parent=root, title='Choose the directory path')
+        path = tkFileDialog.askdirectory(parent=root, title='Choose the directory path')
         self.Path_Entry.delete(0, END)
         self.Path_Entry.insert(0, path)
-        if self.checkValidPath():
+        if self.checkValidPath() and self.check_not_empty_files():
             self.Bins_Entry.configure(state='normal')
             self.train_df = pd.read_csv(str(self.Path_Entry.get()) + "/train.csv")
         else:
@@ -54,20 +55,20 @@ class GUI:
     def buildClick(self):
         if self.checkValidPath() and self.checkValidBins():
             self._nbc = NaiveBayesClassifier.data(str(self.Path_Entry.get()), self.bins)
-            self._nbc.loadTrainDataFrame()
+            self._nbc.load_train_data_frame()
             self.BuildPassed = True
-            tkinter.messagebox.showinfo("Message", "Building classifier using train-set is done!")
+            tkMessageBox.showinfo("Message", "Building classifier using train-set is done!")
         else:
             self.BuildPassed = False
     # handled the Classify button
     def classifyClick(self):
         if not self.BuildPassed:
-            tkinter.messagebox.showinfo("Error", "You need to build the model first!")
+            tkMessageBox.showinfo("Error", "You need to build the model first!")
         else:
-            self._nbc.loadTestSet()
-            tkinter.messagebox.showinfo("Message", "The Classify is done!")
+            self._nbc.load_test_set()
+            tkMessageBox.showinfo("Message", "The Classify is done!")
 
-  # Checks if all the files are exists in the given directory path
+    # Checks if all the files are exists in the given directory path
     def checkValidPath(self):
         error = False
         missing_files = ""
@@ -81,14 +82,47 @@ class GUI:
             error = True
             missing_files += "<test.csv> "
         if error:
-            tkinter.messagebox.showinfo("Error", "The following files are missing in the directory: \n" + missing_files)
+            tkMessageBox.showinfo("Error", "The following files are missing in the directory: \n" + missing_files)
             return False
         return True
+    # checks if the content of the files is empty
+    def check_not_empty_files(self):
+        error = False
+        empty_files = ""
+        if os.path.getsize(self.Path_Entry.get()+"/Structure.txt")==0:
+            error = True
+            empty_files += "<Structure.txt> "
+        # check train file
+        if self.check_is_csv_empty("train.csv"):
+            error = True
+            empty_files += "<train.csv> "
+        # check test file
+        if self.check_is_csv_empty("test.csv"):
+            error = True
+            empty_files += "<test.csv> "
+            if error:
+                tkMessageBox.showinfo("Error", "The following files are empty: \n" + empty_files)
+                return False
+            return True
+
+    # check is the csv file empty
+    def check_is_csv_empty(self, file_name):
+        file = open(self.Path_Entry.get() + "/"+file_name, "r")
+        file_content = file.read()
+        file.close()
+        if file_content == "":
+            return True
+        else:
+            rows = file_content.split("\n", 1)
+            if rows[1] == "":
+                return True
+        return False
+
 
     # Checks if bins value is valid
     def checkValidBins(self):
         self.bins = self.Bins_Entry.get()
-        num_of_records= self.train_df.shape[0]
+        num_of_records = self.train_df.shape[0]
         # check if the bins value is digit AND bigger then 1
         if not self.bins.isdigit():
             tkinter.messagebox.showinfo("Error", "The bins value is not valid. Bins value must be digit!")
