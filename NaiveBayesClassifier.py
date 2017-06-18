@@ -148,4 +148,4 @@ class classifier:
             # choose best matching class by mestimate
             classification = max(mestimate.iterkeys(), key=(lambda key: mestimate[key]))
             classification_testfile = classification_testfile+str(index+1)+" "+str(classification)+"\n"
-
+        return classification_testfile
