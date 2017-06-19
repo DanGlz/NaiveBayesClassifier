@@ -1,4 +1,5 @@
 import os.path
+import os
 from Tkinter import *
 import tkFileDialog
 import tkMessageBox
@@ -57,16 +58,17 @@ class GUI:
             self._nbc = NaiveBayesClassifier.NaiveBayesClassifier(str(self.Path_Entry.get()), self.bins)
             self._nbc.load_train_data_frame()
             self.BuildPassed = True
-            tkMessageBox.showinfo("Message", "Building classifier using train-set is done!")
+            tkMessageBox.showinfo("Naive Bayes Classifier","Building classifier using train-set is done!")
         else:
             self.BuildPassed = False
     # handled the Classify button
     def classifyClick(self):
         if not self.BuildPassed:
-            tkMessageBox.showinfo("Error", "You need to build the model first!")
+            tkMessageBox.showinfo("Naive Bayes Classifier", "Error!\nYou need to build the model first!")
         else:
             self._nbc.load_test_set()
-            tkMessageBox.showinfo("Message", "The Classify is done!")
+            tkMessageBox.showinfo("Naive Bayes Classifier", "The Classify is done!")
+            os._exit(0)
 
     # Checks if all the files are exists in the given directory path
     def checkValidPath(self):
@@ -82,7 +84,7 @@ class GUI:
             error = True
             missing_files += "<test.csv> "
         if error:
-            tkMessageBox.showinfo("Error", "The following files are missing in the directory: \n" + missing_files)
+            tkMessageBox.showinfo("Naive Bayes Classifier", "Error!\nThe following files are missing in the directory: \n" + missing_files)
             return False
         return True
     # checks if the content of the files is empty
@@ -101,7 +103,7 @@ class GUI:
             error = True
             empty_files += "<test.csv> "
             if error:
-                tkMessageBox.showinfo("Error", "The following files are empty: \n" + empty_files)
+                tkMessageBox.showinfo("Naive Bayes Classifier", "Error!\nThe following files are empty: \n" + empty_files)
                 return False
         return True
 
@@ -118,17 +120,16 @@ class GUI:
                 return True
         return False
 
-
     # Checks if bins value is valid
     def checkValidBins(self):
         self.bins = self.Bins_Entry.get()
         num_of_records = self.train_df.shape[0]
         # check if the bins value is digit AND bigger then 1
         if not self.bins.isdigit():
-            tkMessageBox.showinfo("Error", "The bins value is not valid. Bins value must be digit!")
+            tkMessageBox.showinfo("Naive Bayes Classifier", "Error!\nThe bins value is not valid. Bins value must be digit!")
             return False
         if int(self.bins) < 2 or int(self.bins) > num_of_records:
-            tkMessageBox.showinfo("Error", "The bins value is out of range!")
+            tkMessageBox.showinfo("Naive Bayes Classifier", "Error!\nThe bins value is out of range!")
             return False
         self.bins = int(self.bins)
         return True;
