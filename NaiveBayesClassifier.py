@@ -123,12 +123,12 @@ class classifier:
             mestimate={}
             # initialize mestiamte for each class value
             for cls in self.struct["class"]:
-                mestimate[str(cls)] = 1
+                mestimate[str(cls).lower()] = 1
             for colname in self.df.columns:
                 if colname == "class":
                     continue
                 for cls in self.struct["class"]:
-                    cls = str(cls)
+                    cls = str(cls).lower()
                     # memoization of all attribute value and class value that match
                     dictKey = colname + "_" + str(row[colname]) + "_" + str(cls)
                     if dictKey in matching_class_atribute_dict:
@@ -143,9 +143,12 @@ class classifier:
                     num_of_vals_class = self.classcountdict[cls]
                     mestimate[cls] = float(mestimate[cls])*(samples_with_both_values+(m/num_of_diff_values_attr))/( num_of_vals_class+m)
             for cls in self.struct["class"]:
-                cls = str(cls)
+                cls = str(cls).lower()
                 mestimate[str(cls)] = float(mestimate[cls])*(float(self.classcountdict[cls])/num_of_row_in_train)
             # choose best matching class by mestimate
             classification = max(mestimate.iterkeys(), key=(lambda key: mestimate[key]))
+            if classification == row["class"]:
+                count_correct = count_correct+1
             classification_testfile = classification_testfile+str(index+1)+" "+str(classification)+"\n"
+        print (count_correct)
         return classification_testfile
