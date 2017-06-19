@@ -147,8 +147,5 @@ class classifier:
                 mestimate[str(cls)] = float(mestimate[cls])*(float(self.classcountdict[cls])/num_of_row_in_train)
             # choose best matching class by mestimate
             classification = max(mestimate.iterkeys(), key=(lambda key: mestimate[key]))
-            if classification == row["class"]:
-                count_correct = count_correct+1
             classification_testfile = classification_testfile+str(index+1)+" "+str(classification)+"\n"
-        print (count_correct)
         return classification_testfile
